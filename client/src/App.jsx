@@ -1,5 +1,12 @@
+import Header from "./components/Header";
+import HomeScreen from "./pages/HomeScreen";
 const App = () => {
-  return <div>App</div>;
+  return (
+    <>
+      <Header />
+      <HomeScreen />
+    </>
+  );
 };
 
 export default App;
