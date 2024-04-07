@@ -11,6 +11,9 @@ app.use(cookieParser());
 //
 app.use("/api/v1/users", userRoutes);
 //
+app.get("/", (req, res) => {
+  res.send("Welcome");
+});
 app.use(notFound);
 app.use(errorHandler);
 export { app };
