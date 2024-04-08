@@ -1,15 +1,38 @@
 import { Form, Button, Row, Col } from "react-bootstrap";
 import FormContainer from "../components/FormContainer";
-import { Link } from "react-router-dom";
-import { useState } from "react";
-
+import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useLoginMutation } from "../redux/slices/usersApiSlice";
+import { setCredentials } from "../redux/slices/authSlice";
+import { toast } from "react-toastify";
+import Loader from "../components/Loader";
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const [login, { isLoading }] = useLoginMutation();
+
+  const { userInfo } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (userInfo) {
+      navigate("/");
+    }
+  }, [navigate, userInfo]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("submit");
+    try {
+      const res = await login({ email, password }).unwrap();
+      dispatch(setCredentials({ ...res }));
+      navigate("/");
+    } catch (err) {
+      toast.error(err?.data?.message || err.error);
+    }
   };
 
   return (
@@ -37,13 +60,13 @@ const LoginScreen = () => {
         <Button variant="primary" type="submit" className="mt-3">
           Submit
         </Button>
-
-        <Row className="py-3">
-          <Col>
-            New Customer? <Link to="/register">Register</Link>
-          </Col>
-        </Row>
       </Form>
+      {isLoading && <Loader />}
+      <Row className="py-3">
+        <Col>
+          New Customer? <Link to="/register">Register</Link>
+        </Col>
+      </Row>
     </FormContainer>
   );
 };
